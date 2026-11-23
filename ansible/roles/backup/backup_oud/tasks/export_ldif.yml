@@ -9,13 +9,13 @@
 - debug:
     var: export.stdout_lines
 
-- name: create backup directory if not exist
+- name: Create OUD backup directory if not present
   file:
-    path: /home/oracle/backup
+    path: "{{ backup_dir_oud }}"
     state: directory
 
-- name: copy export to backup directory
+- name: Copy LDIF export to backup directory
   copy:
     src: /app/ldap_instance/OUD/full_export.ldif
-    dest: /home/oracle/backup/full_export_{{ ansible_date_time.date }}.ldif
+    dest: "{{ backup_dir_oud }}/full_export_{{ ansible_date_time.date }}.ldif"
     remote_src: yes
