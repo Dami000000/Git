@@ -41,9 +41,12 @@
 
     - name: Install/Update JDK
       include_tasks: ../roles/jdk/tasks/jdk_install.yml
-      vars:
-        backup_dir_jdk: "{{ backup_dir_oam }}"
       tags: [jdk]
+
+    - name: Replace Java cacerts for OAM
+      include_tasks: ../roles/jdk/tasks/java_cacerts.yml
+      when: java_cacerts_enabled | default(false) | bool
+      tags: [jdk, cacerts]
 
     - name: Install/Update OPatch for OAM
       include_tasks: ../roles/opatch_install/tasks/opatch_install_oam.yml

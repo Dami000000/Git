@@ -1,0 +1,87 @@
+---
+- name: Determine Oracle product for cacerts archive
+  set_fact:
+    java_cacerts_product_groups: "{{ ['oam', 'oig', 'ohs', 'oud', 'osb'] | intersect(group_names) }}"
+
+- name: Verify exactly one Oracle product group is selected for cacerts
+  assert:
+    that:
+      - java_cacerts_product_groups | length == 1
+    fail_msg: "Could not uniquely determine Oracle product for cacerts on {{ inventory_hostname }}: {{ java_cacerts_product_groups }}"
+
+- name: Set cacerts archive path for this product
+  set_fact:
+    java_cacerts_archive: "{{ lookup('vars', 'java_cacerts_dir_' ~ java_cacerts_product_groups[0]) }}"
+
+- name: Verify product cacerts archive exists
+  stat:
+    path: "{{ java_cacerts_archive }}"
+  register: java_cacerts_archive_stat
+
+- name: Stop if product cacerts archive is missing
+  assert:
+    that:
+      - java_cacerts_archive_stat.stat.exists
+      - java_cacerts_archive_stat.stat.isreg
+    fail_msg: "cacerts archive not found: {{ java_cacerts_archive }}"
+
+- name: Find cacerts truststore in the installed JDK
+  find:
+    paths: "{{ java_home }}"
+    patterns: cacerts
+    recurse: yes
+    file_type: file
+  register: java_cacerts_target_files
+
+- name: Verify installed JDK contains exactly one cacerts truststore
+  assert:
+    that:
+      - java_cacerts_target_files.matched | int == 1
+    fail_msg: "Expected exactly one cacerts file under {{ java_home }}, found {{ java_cacerts_target_files.matched }}."
+
+- name: Preserve original cacerts beside the truststore
+  copy:
+    src: "{{ java_cacerts_target_files.files[0].path }}"
+    dest: "{{ java_cacerts_target_files.files[0].path }}.org_data"
+    remote_src: yes
+    force: no
+
+- name: Create temporary directory for cacerts archive
+  tempfile:
+    state: directory
+    suffix: _java_cacerts
+  register: java_cacerts_temp
+
+- name: Extract provided cacerts archive
+  unarchive:
+    src: "{{ java_cacerts_archive }}"
+    dest: "{{ java_cacerts_temp.path }}"
+    remote_src: yes
+
+- name: Locate cacerts file in extracted archive
+  find:
+    paths: "{{ java_cacerts_temp.path }}"
+    patterns: cacerts
+    recurse: yes
+    file_type: file
+  register: provided_cacerts_files
+
+- name: Verify archive contains exactly one cacerts file
+  assert:
+    that:
+      - provided_cacerts_files.matched | int == 1
+    fail_msg: "The archive {{ java_cacerts_archive }} must contain exactly one file named cacerts."
+
+- name: Replace Java cacerts with the supplied truststore
+  copy:
+    src: "{{ provided_cacerts_files.files[0].path }}"
+    dest: "{{ java_cacerts_target_files.files[0].path }}"
+    remote_src: yes
+    owner: "{{ oracle_user }}"
+    group: "{{ oracle_group }}"
+    mode: preserve
+
+- name: Remove temporary cacerts extraction directory
+  file:
+    path: "{{ java_cacerts_temp.path }}"
+    state: absent
