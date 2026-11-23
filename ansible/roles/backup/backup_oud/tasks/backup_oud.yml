@@ -1,17 +1,17 @@
 ---
-- name: Create backup directory if not exist
+- name: Create OUD backup directory if not present
   file:
-    path: /home/oracle/backup
+    path: "{{ backup_dir_oud }}"
     state: directory
 
-- name: Create backup of OUD ldap instance
+- name: Create backup of OUD LDAP instance
   archive:
-    path: /app/ldap_instance
-    dest: /home/oracle/backup/ldap_instance_{{ ansible_date_time.date }}_full_backup.tar.gz
+    path: "{{ oud_ldap_instance }}"
+    dest: "{{ backup_dir_oud }}/ldap_instance_{{ ansible_date_time.date }}_full_backup.tar.gz"
     format: gz
 
-- name: Create backup of OUD oracle home - {{ oracle_home_oud }}
+- name: Create backup of OUD Oracle Home - {{ oracle_home_oud }}
   archive:
     path: "{{ oracle_home_oud }}"
-    dest: /home/oracle/backup/fmwOUD12214_{{ ansible_date_time.date }}_full_backup.tar.gz
+    dest: "{{ backup_dir_oud }}/fmwOUD12214_{{ ansible_date_time.date }}_full_backup.tar.gz"
     format: gz
