@@ -1,0 +1,45 @@
+---
+- name: Ensure binaries directory exists before cleanup
+  file:
+    path: "{{ binaries_dir }}"
+    state: directory
+
+- name: Find SPBAT logs directories to preserve
+  find:
+    paths: "{{ binaries_dir }}"
+    patterns: logs
+    file_type: directory
+    recurse: yes
+    hidden: yes
+  register: spbat_log_directories
+  when: archive_spbat_logs | default(false) | bool
+
+- name: Ensure patch backup directory exists for SPBAT logs
+  file:
+    path: "{{ patch_backup_dir }}"
+    state: directory
+    owner: "{{ oracle_user }}"
+    group: "{{ oracle_group }}"
+    mode: '0755'
+  when:
+    - archive_spbat_logs | default(false) | bool
+    - spbat_log_directories.matched | default(0) | int > 0
+
+- name: Archive SPBAT logs before removing binaries
+  archive:
+    path: "{{ item.path }}"
+    dest: "{{ patch_backup_dir }}/{{ patch_product }}_spbat_logs_{{ ansible_date_time.iso8601_basic_short }}_{{ log_archive_index }}.tar.gz"
+    format: gz
+  loop: "{{ spbat_log_directories.files | default([]) }}"
+  loop_control:
+    index_var: log_archive_index
+    label: "{{ item.path }}"
+  when: archive_spbat_logs | default(false) | bool
+
+- name: Remove patch files and extracted directories from binaries directory
+  shell: >-
+    find "{{ binaries_dir }}" -mindepth 1 -maxdepth 1 -exec rm -rf -- {} +
+  args:
+    executable: /bin/bash
+  when: binaries_dir != '/' and binaries_dir | length > 1
+  changed_when: true

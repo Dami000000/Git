@@ -13,9 +13,6 @@
 #   Patch specific server:
 #     ansible-playbook -i inventory/dev/hosts playbooks/patch_ohs.yml -e "target=ohs1.ap1.dev.ccn2.taxud"
 #
-#   Patch on FAT environment:
-#     ansible-playbook -i inventory/fat/hosts playbooks/patch_ohs.yml -e "target=ohs_ap1"
-#
 #   Override serial (default: 1 host at a time):
 #     ansible-playbook -i inventory/dev/hosts playbooks/patch_ohs.yml -e "serial=2"
 #
@@ -62,6 +59,14 @@
         oracle_home: "{{ oracle_home_ohs }}"
         opatch_home: "{{ opatch_home_ohs }}"
       tags: [patch_cleanup]
+
+    - name: Cleanup OHS binaries directory
+      include_tasks: ../roles/binaries_cleanup/tasks/main.yml
+      vars:
+        patch_product: ohs
+        patch_backup_dir: "{{ backup_dir_ohs }}"
+        archive_spbat_logs: false
+      tags: [binaries_cleanup]
 
     - name: Start OHS services
       include_tasks: ../roles/start_cots/start_ohs/tasks/start_ohs.yml

@@ -60,6 +60,14 @@
         opatch_home: "{{ opatch_home_oud }}"
       tags: [patch_cleanup]
 
+    - name: Cleanup OUD binaries directory
+      include_tasks: ../roles/binaries_cleanup/tasks/main.yml
+      vars:
+        patch_product: oud
+        patch_backup_dir: "{{ backup_dir_oud }}"
+        archive_spbat_logs: false
+      tags: [binaries_cleanup]
+
     - name: Start OUD services
       include_tasks: ../roles/start_cots/start_oud/tasks/start_oud.yml
       tags: [start, cots]

@@ -101,6 +101,14 @@
       when: inventory_hostname is match('^oim1\\.')
       tags: [cleanup]
 
+    - name: Cleanup OIG binaries directory
+      include_tasks: ../roles/binaries_cleanup/tasks/main.yml
+      vars:
+        patch_product: oig
+        patch_backup_dir: "{{ backup_dir_oig }}"
+        archive_spbat_logs: true
+      tags: [binaries_cleanup]
+
     - name: Start OIG services
       include_tasks: ../roles/start_cots/start_oig/tasks/start_oig.yml
       tags: [start, cots]

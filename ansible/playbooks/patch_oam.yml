@@ -102,6 +102,14 @@
       when: inventory_hostname == 'oam1.' + ap + '.' + env + '.ccn2.taxud'
       tags: [cleanup]
 
+    - name: Cleanup OAM binaries directory
+      include_tasks: ../roles/binaries_cleanup/tasks/main.yml
+      vars:
+        patch_product: oam
+        patch_backup_dir: "{{ backup_dir_oam }}"
+        archive_spbat_logs: true
+      tags: [binaries_cleanup]
+
     - name: Start OAM services
       include_tasks: ../roles/start_cots/start_oam/tasks/start_oam.yml
       tags: [start, cots]
