@@ -67,6 +67,41 @@
         opatch_home: "{{ opatch_home_oam }}"
       tags: [patch_cleanup]
 
+    - name: Clean OAM node1 managed server tmp and cache
+      shell: >-
+        if [ -d "{{ oam_managed_server_domain }}/servers/{{ item.0 }}/{{ item.1 }}" ]; then
+          find "{{ oam_managed_server_domain }}/servers/{{ item.0 }}/{{ item.1 }}" -mindepth 1 -delete;
+        fi
+      loop: "{{ (oam_managed_servers_node1 | map(attribute='managed_server_node1') | list) | product(['tmp', 'cache']) | list }}"
+      loop_control:
+        label: "{{ oam_managed_server_domain }}/servers/{{ item.0 }}/{{ item.1 }}"
+      when: inventory_hostname == 'oam1.' + ap + '.' + env + '.ccn2.taxud'
+      tags: [cleanup]
+
+    - name: Clean OAM node2 managed server tmp and cache
+      shell: >-
+        if [ -d "{{ oam_managed_server_domain }}/servers/{{ item.0 }}/{{ item.1 }}" ]; then
+          find "{{ oam_managed_server_domain }}/servers/{{ item.0 }}/{{ item.1 }}" -mindepth 1 -delete;
+        fi
+      loop: "{{ (oam_managed_servers_node2 | map(attribute='managed_server_node2') | list) | product(['tmp', 'cache']) | list }}"
+      loop_control:
+        label: "{{ oam_managed_server_domain }}/servers/{{ item.0 }}/{{ item.1 }}"
+      when: inventory_hostname == 'oam2.' + ap + '.' + env + '.ccn2.taxud'
+      tags: [cleanup]
+
+    - name: Clean OAM AdminServer tmp and cache on node1
+      shell: >-
+        if [ -d "{{ oam_admin_server_domain }}/servers/AdminServer/{{ item }}" ]; then
+          find "{{ oam_admin_server_domain }}/servers/AdminServer/{{ item }}" -mindepth 1 -delete;
+        fi
+      loop:
+        - tmp
+        - cache
+      loop_control:
+        label: "{{ oam_admin_server_domain }}/servers/AdminServer/{{ item }}"
+      when: inventory_hostname == 'oam1.' + ap + '.' + env + '.ccn2.taxud'
+      tags: [cleanup]
+
     - name: Start OAM services
       include_tasks: ../roles/start_cots/start_oam/tasks/start_oam.yml
       tags: [start, cots]
