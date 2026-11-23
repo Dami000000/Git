@@ -19,4 +19,4 @@
     cmd: "tar czf {{ backup_dir_oig }}/Admin_OIG_config_{{ ansible_date_time.date }}_full_backup.tar.gz {{ oig_admin_server_domain }}"
     warn: false
   when:
-    - inventory_hostname == 'oim1.' + ap + '.' + env + '.ccn2.taxud'
+    - inventory_hostname == 'oim1.' + mh + '.' + env + '.ccn2.taxud'
