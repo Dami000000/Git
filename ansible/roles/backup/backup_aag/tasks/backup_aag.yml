@@ -1,11 +1,11 @@
 ---
-- name: Create backup directory if not exist
+- name: Create AAG backup directory if not present
   file:
-    path: /home/oracle/backup
+    path: "{{ backup_dir_aag }}"
     state: directory
 
 - name: Create AAG backup installation home
   archive:
-    path: /app/Axway-7.7.0
-    dest: /home/oracle/backup/Axway-7.7.0_{{ ansible_date_time.date }}_full_backup.tar.gz
+    path: "{{ aag_install_dir }}"
+    dest: "{{ backup_dir_aag }}/Axway-7.7.0_{{ ansible_date_time.date }}_full_backup.tar.gz"
     format: gz
