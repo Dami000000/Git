@@ -1,18 +1,17 @@
 ---
-- name: create backup directory if not exist
+- name: Create OSB backup directory if not present
   file:
-    path: /home/oracle/backup
+    path: "{{ backup_dir_osb }}"
     state: directory
 
-- name: create backup of OSB Domain - /app/domains
+- name: Create backup of OSB Domain - {{ osb_domain }}
   archive:
-    path: /app/domains
-    dest: /home/oracle/backup/OSB_domain_{{ ansible_date_time.date }}_full_buckup.tar.gz
+    path: "{{ osb_domain }}"
+    dest: "{{ backup_dir_osb }}/OSB_domain_{{ ansible_date_time.date }}_full_backup.tar.gz"
     format: gz
 
-- name: create backup of OSB  binaries /app/fmwOSB12214
+- name: Create backup of OSB binaries - {{ oracle_home_osb }}
   archive:
-    path: /app/fmwOSB12214
-    dest: /home/oracle/backup/fmwOSB12214_{{ ansible_date_time.date }}_full_buckup.tar.gz
+    path: "{{ oracle_home_osb }}"
+    dest: "{{ backup_dir_osb }}/fmwOSB12214_{{ ansible_date_time.date }}_full_backup.tar.gz"
     format: gz
-
