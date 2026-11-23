@@ -59,6 +59,13 @@
       include_tasks: ../roles/patch/oig_patch_install/tasks/oig_install.yml
       tags: [patch]
 
+    - name: Cleanup inactive OIG patches
+      include_tasks: ../roles/opatch_cleanup/tasks/delete_inactive_patches.yml
+      vars:
+        oracle_home: "{{ oracle_home_oig }}"
+        opatch_home: "{{ opatch_home_oig }}"
+      tags: [patch_cleanup]
+
     - name: Start OIG services
       include_tasks: ../roles/start_cots/start_oig/tasks/start_oig.yml
       tags: [start, cots]
