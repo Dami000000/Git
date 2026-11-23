@@ -1,23 +1,19 @@
-[all:vars]
-ansible_user=oracle 
-ansible_connection=ssh 
-
 ### OUD ###
 [oud_ap1]
-oud1.ap1.prod.ccn2.taxud
-oud2.ap1.prod.ccn2.taxud
+oud1.ap1.prod.ccn2.taxud ansible_ssh_host=oud1.ap1.prod.ccn2.adm
+oud2.ap1.prod.ccn2.taxud ansible_ssh_host=oud2.ap1.prod.ccn2.adm
 [oud_ap2]
-oud1.ap2.prod.ccn2.taxud
-oud2.ap2.prod.ccn2.taxud
+oud1.ap2.prod.ccn2.taxud ansible_ssh_host=oud1.ap2.prod.ccn2.adm
+oud2.ap2.prod.ccn2.taxud ansible_ssh_host=oud2.ap2.prod.ccn2.adm
 [oud_ap3]
-oud1.ap3.prod.ccn2.taxud
-oud2.ap3.prod.ccn2.taxud
+oud1.ap3.prod.ccn2.taxud ansible_ssh_host=oud1.ap3.prod.ccn2.adm
+oud2.ap3.prod.ccn2.taxud ansible_ssh_host=oud2.ap3.prod.ccn2.adm
 [oud_ap4]
-oud1.ap4.prod.ccn2.taxud
-oud2.ap4.prod.ccn2.taxud
+oud1.ap4.prod.ccn2.taxud ansible_ssh_host=oud1.ap4.prod.ccn2.adm
+oud2.ap4.prod.ccn2.taxud ansible_ssh_host=oud2.ap4.prod.ccn2.adm
 [oud_mh]
-oud1.mh.prod.ccn2.taxud
-oud2.mh.prod.ccn2.taxud
+oud1.mh.prod.ccn2.taxud ansible_ssh_host=oud1.mh.prod.ccn2.adm
+oud2.mh.prod.ccn2.taxud ansible_ssh_host=oud2.mh.prod.ccn2.adm
 [oud:children]
 oud_ap1
 oud_ap2
@@ -27,30 +23,29 @@ oud_mh
 
 ### OHS ###
 [ohs_ap1]
-ohs1.ap1.prod.ccn2.taxud
-ohs2.ap1.prod.ccn2.taxud
+ohS1.ap1.prod.ccn2.taxud ansible_ssh_host=ohS1.ap1.prod.ccn2.adm
+ohS2.ap1.prod.ccn2.taxud ansible_ssh_host=ohS2.ap1.prod.ccn2.adm
 [ohs_ap2]
-ohs1.ap2.prod.ccn2.taxud
-ohs2.ap2.prod.ccn2.taxud
+ohS1.ap2.prod.ccn2.taxud ansible_ssh_host=ohS1.ap2.prod.ccn2.adm
+ohS2.ap2.prod.ccn2.taxud ansible_ssh_host=ohS2.ap2.prod.ccn2.adm
 [ohs_ap3]
-ohs1.ap3.prod.ccn2.taxud
-ohs2.ap3.prod.ccn2.taxud
+ohS1.ap3.prod.ccn2.taxud ansible_ssh_host=ohS1.ap3.prod.ccn2.adm
+ohS2.ap3.prod.ccn2.taxud ansible_ssh_host=ohS2.ap3.prod.ccn2.adm
 [ohs:children]
-ohs_ap1
-ohs_ap2
-ohs_ap3
-
+ohS_ap1
+ohS_ap2
+ohS_ap3
 
 ### OAM ###
 [oam_ap1]
-oam1.ap1.prod.ccn2.taxud
-oam2.ap1.prod.ccn2.taxud
+oam1.ap1.prod.ccn2.taxud ansible_ssh_host=oam1.ap1.prod.ccn2.adm
+oam2.ap1.prod.ccn2.taxud ansible_ssh_host=oam2.ap1.prod.ccn2.adm
 [oam_ap2]
-oam1.ap2.prod.ccn2.taxud
-oam2.ap2.prod.ccn2.taxud
+oam1.ap2.prod.ccn2.taxud ansible_ssh_host=oam1.ap2.prod.ccn2.adm
+oam2.ap2.prod.ccn2.taxud ansible_ssh_host=oam2.ap2.prod.ccn2.adm
 [oam_ap3]
-oam1.ap3.prod.ccn2.taxud
-oam2.ap3.prod.ccn2.taxud
+oam1.ap3.prod.ccn2.taxud ansible_ssh_host=oam1.ap3.prod.ccn2.adm
+oam2.ap3.prod.ccn2.adm ansible_ssh_host=oam2.ap3.prod.ccn2.adm
 [oam:children]
 oam_ap1
 oam_ap2
@@ -58,24 +53,24 @@ oam_ap3
 
 ### OIG ###
 [oig_mh]
-oim1.mh.prod.ccn2.taxud
-oim2.mh.prod.ccn2.taxud
+oim1.mh.prod.ccn2.taxud ansible_ssh_host=oim1.mh.prod.ccn2.adm
+oim2.mh.prod.ccn2.taxud ansible_ssh_host=oim2.mh.prod.ccn2.adm
 [oig:children]
 oig_mh
 
 ### OSB ###
 [osb_ap1]
-osb1.ap1.prod.ccn2.taxud
-osb2.ap1.prod.ccn2.taxud
+osb1.ap1.prod.ccn2.taxud ansible_ssh_host=osb1.ap1.prod.ccn2.adm
+osb2.ap1.prod.ccn2.taxud ansible_ssh_host=osb2.ap1.prod.ccn2.adm
 [osb_ap2]
-osb1.ap2.prod.ccn2.taxud
-osb2.ap2.prod.ccn2.taxud
+osb1.ap2.prod.ccn2.taxud ansible_ssh_host=osb1.ap2.prod.ccn2.adm
+osb2.ap2.prod.ccn2.taxud ansible_ssh_host=osb2.ap2.prod.ccn2.adm
 [osb_ap3]
-osb1.ap3.prod.ccn2.taxud
-osb2.ap3.prod.ccn2.taxud
+osb1.ap3.prod.ccn2.taxud ansible_ssh_host=osb1.ap3.prod.ccn2.adm
+osb2.ap3.prod.ccn2.taxud ansible_ssh_host=osb2.ap3.prod.ccn2.adm
 [osb_ap4]
-osb1.ap4.prod.ccn2.taxud
-osb2.ap4.prod.ccn2.taxud
+osb1.ap4.prod.ccn2.taxud ansible_ssh_host=osb1.ap4.prod.ccn2.adm
+osb2.ap4.prod.ccn2.taxud ansible_ssh_host=osb2.ap4.prod.ccn2.adm
 [osb:children]
 osb_ap1
 osb_ap2
@@ -84,17 +79,17 @@ osb_ap4
 
 ### AAG ###
 [aag_ap1]
-aag1.ap1.prod.ccn2.taxud
-aag2.ap1.prod.ccn2.taxud
+aag1.ap1.prod.ccn2.taxud ansible_ssh_host=aag1.ap1.prod.ccn2.adm
+aag2.ap1.prod.ccn2.taxud ansible_ssh_host=aag2.ap1.prod.ccn2.adm
 [aag_ap2]
-aag1.ap2.prod.ccn2.taxud
-aag2.ap2.prod.ccn2.taxud
+aag1.ap2.prod.ccn2.taxud ansible_ssh_host=aag1.ap2.prod.ccn2.adm
+aag2.ap2.prod.ccn2.taxud ansible_ssh_host=aag2.ap2.prod.ccn2.adm
 [aag_ap3]
-aag1.ap3.prod.ccn2.taxud
-aag2.ap3.prod.ccn2.taxud
+aag1.ap3.prod.ccn2.taxud ansible_ssh_host=aag1.ap3.prod.ccn2.adm
+aag2.ap3.prod.ccn2.taxud ansible_ssh_host=aag2.ap3.prod.ccn2.adm
 [aag_ap4]
-aag1.ap4.prod.ccn2.taxud
-aag2.ap4.prod.ccn2.taxud
+aag1.ap4.prod.ccn2.taxud ansible_ssh_host=aag1.ap4.prod.ccn2.adm
+aag2.ap4.prod.ccn2.taxud ansible_ssh_host=aag2.ap4.prod.ccn2.adm
 [aag:children]
 aag_ap1
 aag_ap2
