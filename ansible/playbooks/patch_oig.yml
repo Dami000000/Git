@@ -101,7 +101,7 @@
       when: inventory_hostname is match('^oim1\\.')
       tags: [cleanup]
 
-    - name: Cleanup OIG binaries directory
+    - name: Cleanup patch installation directory
       include_tasks: ../roles/binaries_cleanup/tasks/main.yml
       vars:
         patch_product: oig

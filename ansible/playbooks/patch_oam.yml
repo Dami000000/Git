@@ -102,7 +102,7 @@
       when: inventory_hostname == 'oam1.' + ap + '.' + env + '.ccn2.taxud'
       tags: [cleanup]
 
-    - name: Cleanup OAM binaries directory
+    - name: Cleanup patch installation directory
       include_tasks: ../roles/binaries_cleanup/tasks/main.yml
       vars:
         patch_product: oam

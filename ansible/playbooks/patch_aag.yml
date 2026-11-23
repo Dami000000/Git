@@ -72,6 +72,14 @@
       when: "(aag_trace_xml.content | b64decode) is not search('<FileRolloverTrace\\b')"
       tags: [trace_config]
 
+    - name: Cleanup patch installation directory
+      include_tasks: ../roles/binaries_cleanup/tasks/main.yml
+      vars:
+        patch_product: aag
+        patch_backup_dir: "{{ backup_dir_aag }}"
+        archive_spbat_logs: false
+      tags: [binaries_cleanup]
+
     - name: Start AAG services
       include_tasks: ../roles/start_cots/start_aag/tasks/start_aag.yml
       tags: [start, cots]

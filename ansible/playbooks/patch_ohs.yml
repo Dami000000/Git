@@ -60,7 +60,7 @@
         opatch_home: "{{ opatch_home_ohs }}"
       tags: [patch_cleanup]
 
-    - name: Cleanup OHS binaries directory
+    - name: Cleanup patch installation directory
       include_tasks: ../roles/binaries_cleanup/tasks/main.yml
       vars:
         patch_product: ohs
