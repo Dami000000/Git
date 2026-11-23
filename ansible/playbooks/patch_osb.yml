@@ -55,6 +55,13 @@
       include_tasks: ../roles/patch/osb_patch_install/tasks/osb_install.yml
       tags: [patch]
 
+    - name: Delete inactive OSB patches
+      include_tasks: ../roles/opatch_cleanup/tasks/delete_inactive_patches.yml
+      vars:
+        oracle_home: "{{ oracle_home_osb }}"
+        opatch_home: "{{ opatch_home_osb }}"
+      tags: [patch_cleanup]
+
     - name: Start OSB services
       include_tasks: ../roles/start_cots/start_osb/tasks/start_osb.yml
       tags: [start, cots]

@@ -1,0 +1,4 @@
+---
+- name: Remove inactive patches from Oracle Home
+  ansible.builtin.command:
+    cmd: "{{ opatch_home }}/opatch util deleteinactivepatches -oh {{ oracle_home }} -silent"

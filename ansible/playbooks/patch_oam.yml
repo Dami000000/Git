@@ -55,6 +55,13 @@
       include_tasks: ../roles/patch/oam_patch_install/tasks/oam_install.yml
       tags: [patch]
 
+    - name: Delete inactive OAM patches
+      include_tasks: ../roles/opatch_cleanup/tasks/delete_inactive_patches.yml
+      vars:
+        oracle_home: "{{ oracle_home_oam }}"
+        opatch_home: "{{ opatch_home_oam }}"
+      tags: [patch_cleanup]
+
     - name: Start OAM services
       include_tasks: ../roles/start_cots/start_oam/tasks/start_oam.yml
       tags: [start, cots]

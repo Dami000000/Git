@@ -51,6 +51,13 @@
       include_tasks: ../roles/patch/oud_patch_install/tasks/oud_install.yml
       tags: [patch]
 
+    - name: Delete inactive OUD patches
+      include_tasks: ../roles/opatch_cleanup/tasks/delete_inactive_patches.yml
+      vars:
+        oracle_home: "{{ oracle_home_oud }}"
+        opatch_home: "{{ opatch_home_oud }}"
+      tags: [patch_cleanup]
+
     - name: Start OUD services
       include_tasks: ../roles/start_cots/start_oud/tasks/start_oud.yml
       tags: [start, cots]
