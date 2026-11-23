@@ -66,6 +66,41 @@
         opatch_home: "{{ opatch_home_oig }}"
       tags: [patch_cleanup]
 
+    - name: Clean OIG node1 managed server tmp and cache
+      shell: >-
+        if [ -d "{{ oig_managed_server_domain }}/servers/{{ item.0 }}/{{ item.1 }}" ]; then
+          find "{{ oig_managed_server_domain }}/servers/{{ item.0 }}/{{ item.1 }}" -mindepth 1 -delete;
+        fi
+      loop: "{{ (oig_managed_servers_node1 | map(attribute='managed_server_node1') | list) | product(['tmp', 'cache']) | list }}"
+      loop_control:
+        label: "{{ oig_managed_server_domain }}/servers/{{ item.0 }}/{{ item.1 }}"
+      when: inventory_hostname is match('^oim1\\.')
+      tags: [cleanup]
+
+    - name: Clean OIG node2 managed server tmp and cache
+      shell: >-
+        if [ -d "{{ oig_managed_server_domain }}/servers/{{ item.0 }}/{{ item.1 }}" ]; then
+          find "{{ oig_managed_server_domain }}/servers/{{ item.0 }}/{{ item.1 }}" -mindepth 1 -delete;
+        fi
+      loop: "{{ (oig_managed_servers_node2 | map(attribute='managed_server_node2') | list) | product(['tmp', 'cache']) | list }}"
+      loop_control:
+        label: "{{ oig_managed_server_domain }}/servers/{{ item.0 }}/{{ item.1 }}"
+      when: inventory_hostname is match('^oim2\\.')
+      tags: [cleanup]
+
+    - name: Clean OIG AdminServer tmp and cache on node1
+      shell: >-
+        if [ -d "{{ oig_admin_server_domain }}/servers/AdminServer/{{ item }}" ]; then
+          find "{{ oig_admin_server_domain }}/servers/AdminServer/{{ item }}" -mindepth 1 -delete;
+        fi
+      loop:
+        - tmp
+        - cache
+      loop_control:
+        label: "{{ oig_admin_server_domain }}/servers/AdminServer/{{ item }}"
+      when: inventory_hostname is match('^oim1\\.')
+      tags: [cleanup]
+
     - name: Start OIG services
       include_tasks: ../roles/start_cots/start_oig/tasks/start_oig.yml
       tags: [start, cots]
