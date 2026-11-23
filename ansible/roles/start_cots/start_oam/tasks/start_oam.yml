@@ -1,0 +1,201 @@
+---
+- name: Check OAM Node Manager process
+  shell: "pgrep -f 'startNodeManager'"
+  register: nodemanager_process_check
+  ignore_errors: yes
+  changed_when: False
+  failed_when: False
+
+- name: Check OAM Managed server process
+  shell: "pgrep -f '/IAMAccessDomain/config/fmwconfig/servers/wls_oam'"
+  register: managed_process_check
+  ignore_errors: yes
+  changed_when: False
+  failed_when: False
+
+- name: Check OAM AMA Managed server process
+  shell: "pgrep -f '/IAMAccessDomain/config/fmwconfig/servers/wls_ama'"
+  register: ama_process_check
+  ignore_errors: yes
+  changed_when: False
+  failed_when: False
+
+- name: Check OAM Admin Server process
+  shell: "pgrep -f 'weblogic.Name=AdminServer'"
+  register: admin_process_check
+  ignore_errors: yes
+  when:
+    - inventory_hostname == 'oam1.' + ap + '.' + env + '.ccn2.taxud'
+  changed_when: False
+  failed_when: False
+
+- name: Start OAM NodeManager
+  shell:
+    cmd: "nohup ./startNodeManager.sh > {{ oam_managed_server_domain }}/nodemanager/nodemanager.out 2>&1 &"
+    chdir: "{{ oam_managed_server_domain }}/bin"
+  when:
+    - nodemanager_process_check.rc != 0
+
+- name: Wait for OAM NodeManager to start
+  wait_for:
+    port: 5556
+    host: "{{ inventory_hostname }}"
+    delay: 5
+    sleep: 5
+    timeout: 120
+  when:
+    - nodemanager_process_check.rc != 0
+
+- name: Start OAM Admin Server
+  shell:
+    cmd: 'nohup {{ oam_admin_server_domain }}/bin/startWebLogic.sh </dev/null >"{{ oam_admin_server_domain }}/servers/AdminServer/logs/AdminServer.out" 2>&1 &'
+  when:
+    - inventory_hostname == 'oam1.' + ap + '.' + env + '.ccn2.taxud'
+    - admin_process_check.rc != 0
+
+- name: Wait for OAM Admin Server to Start
+  wait_for:
+    host: "oam-{{ ap }}-intvip.bck.{{ env }}.ccn2.taxud"
+    port: "{{ oam_admin_server_port }}"
+    delay: 15
+    sleep: 15
+    timeout: 600
+  when:
+    - inventory_hostname == 'oam1.' + ap + '.' + env + '.ccn2.taxud'
+    - admin_process_check.rc != 0
+
+- name: Copy WLST start script for OAM node1
+  template:
+    src: "{{ role_path }}/templates/start_oam_managed.py"
+    dest: /tmp/start_oam_managed_node1.py
+    mode: '0644'
+  when:
+    - inventory_hostname == 'oam1.' + ap + '.' + env + '.ccn2.taxud'
+    - managed_process_check.rc != 0 or ama_process_check.rc != 0
+
+- name: Copy WLST start script for OAM node2
+  template:
+    src: "{{ role_path }}/templates/start_oam_managed_node2.py"
+    dest: /tmp/start_oam_managed_node2.py
+    mode: '0644'
+  when:
+    - inventory_hostname == 'oam2.' + ap + '.' + env + '.ccn2.taxud'
+    - managed_process_check.rc != 0 or ama_process_check.rc != 0
+
+- name: Start OAM Managed Servers on node1 via WLST
+  shell:
+    cmd: "{{ oracle_home_oam }}/oracle_common/common/bin/wlst.sh /tmp/start_oam_managed_node1.py"
+  register: start_oam_node1_out
+  when:
+    - inventory_hostname == 'oam1.' + ap + '.' + env + '.ccn2.taxud'
+    - managed_process_check.rc != 0 or ama_process_check.rc != 0
+  environment:
+    JAVA_HOME: "{{ java_home }}"
+
+- debug:
+    var: start_oam_node1_out.stdout_lines
+  when:
+    - inventory_hostname == 'oam1.' + ap + '.' + env + '.ccn2.taxud'
+    - managed_process_check.rc != 0 or ama_process_check.rc != 0
+
+- name: Start OAM Managed Servers on node2 via WLST
+  shell:
+    cmd: "{{ oracle_home_oam }}/oracle_common/common/bin/wlst.sh /tmp/start_oam_managed_node2.py"
+  register: start_oam_node2_out
+  when:
+    - inventory_hostname == 'oam2.' + ap + '.' + env + '.ccn2.taxud'
+    - managed_process_check.rc != 0 or ama_process_check.rc != 0
+  environment:
+    JAVA_HOME: "{{ java_home }}"
+
+- debug:
+    var: start_oam_node2_out.stdout_lines
+  when:
+    - inventory_hostname == 'oam2.' + ap + '.' + env + '.ccn2.taxud'
+    - managed_process_check.rc != 0 or ama_process_check.rc != 0
+
+- name: Wait for OAM Managed Server node1 to Start (checking every 15s)
+  wait_for:
+    host: "oam1.{{ ap }}.{{ env }}.ccn2.taxud"
+    port: "{{ oam_managed_server_port }}"
+    delay: 15
+    sleep: 15
+    timeout: 600
+    msg: "Still waiting for wls_oam1 on port {{ oam_managed_server_port }}..."
+  when:
+    - inventory_hostname == 'oam1.' + ap + '.' + env + '.ccn2.taxud'
+    - managed_process_check.rc != 0
+
+- debug:
+    msg: "OAM Managed Server node1 is UP on port {{ oam_managed_server_port }}"
+  when:
+    - inventory_hostname == 'oam1.' + ap + '.' + env + '.ccn2.taxud'
+    - managed_process_check.rc != 0
+
+- name: Wait for OAM Managed Server node2 to Start (checking every 15s)
+  wait_for:
+    host: "oam2.{{ ap }}.{{ env }}.ccn2.taxud"
+    port: "{{ oam_managed_server_port }}"
+    delay: 15
+    sleep: 15
+    timeout: 600
+    msg: "Still waiting for wls_oam2 on port {{ oam_managed_server_port }}..."
+  when:
+    - inventory_hostname == 'oam2.' + ap + '.' + env + '.ccn2.taxud'
+    - managed_process_check.rc != 0
+
+- debug:
+    msg: "OAM Managed Server node2 is UP on port {{ oam_managed_server_port }}"
+  when:
+    - inventory_hostname == 'oam2.' + ap + '.' + env + '.ccn2.taxud'
+    - managed_process_check.rc != 0
+
+- name: Wait for OAM AMA Server node1 to Start (checking every 15s)
+  wait_for:
+    host: "oam1.{{ ap }}.{{ env }}.ccn2.taxud"
+    port: "{{ oam_ama_server_port }}"
+    delay: 15
+    sleep: 15
+    timeout: 600
+    msg: "Still waiting for wls_ama1 on port {{ oam_ama_server_port }}..."
+  when:
+    - inventory_hostname == 'oam1.' + ap + '.' + env + '.ccn2.taxud'
+    - ama_process_check.rc != 0
+
+- debug:
+    msg: "OAM AMA Server node1 is UP on port {{ oam_ama_server_port }}"
+  when:
+    - inventory_hostname == 'oam1.' + ap + '.' + env + '.ccn2.taxud'
+    - ama_process_check.rc != 0
+
+- name: Wait for OAM AMA Server node2 to Start (checking every 15s)
+  wait_for:
+    host: "oam2.{{ ap }}.{{ env }}.ccn2.taxud"
+    port: "{{ oam_ama_server_port }}"
+    delay: 15
+    sleep: 15
+    timeout: 600
+    msg: "Still waiting for wls_ama2 on port {{ oam_ama_server_port }}..."
+  when:
+    - inventory_hostname == 'oam2.' + ap + '.' + env + '.ccn2.taxud'
+    - ama_process_check.rc != 0
+
+- debug:
+    msg: "OAM AMA Server node2 is UP on port {{ oam_ama_server_port }}"
+  when:
+    - inventory_hostname == 'oam2.' + ap + '.' + env + '.ccn2.taxud'
+    - ama_process_check.rc != 0
+
+- name: Remove WLST start script node1
+  file:
+    path: /tmp/start_oam_managed_node1.py
+    state: absent
+  when:
+    - inventory_hostname == 'oam1.' + ap + '.' + env + '.ccn2.taxud'
+
+- name: Remove WLST start script node2
+  file:
+    path: /tmp/start_oam_managed_node2.py
+    state: absent
+  when:
+    - inventory_hostname == 'oam2.' + ap + '.' + env + '.ccn2.taxud'

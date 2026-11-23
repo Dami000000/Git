@@ -1,0 +1,19 @@
+---
+# ============================================================
+# OUD Patch Rollback
+# Rolls back patches listed in oud_patches_rollback (vars.yml)
+# If oud_patches_rollback is empty ([]) this task is skipped
+# Checks lsinventory per-patch sequentially to handle cascade subsets
+# ============================================================
+
+- name: Skip rollback - no patches defined in oud_patches_rollback
+  debug:
+    msg: "No patches to rollback for OUD. Skipping."
+  when: oud_patches_rollback | length == 0
+
+- name: Rollback OUD patches sequentially
+  include_tasks: oud_rollback_single.yml
+  loop: "{{ oud_patches_rollback }}"
+  loop_control:
+    loop_var: patch_item
+  when: oud_patches_rollback | length > 0

@@ -1,0 +1,34 @@
+---
+# ============================================================
+# OSB Patch Install
+# Before applying patches, rollback is performed if
+# osb_patches_rollback list is defined and not empty in vars.yml
+# ============================================================
+
+- name: Upload patch {{ item.patch_archive }}
+  copy:
+    src: "{{ patches_dir_osb }}/{{ item.patch_archive }}"
+    dest: "{{ binaries_dir }}/{{ item.patch_archive }}"
+  with_items: "{{ osb_patches_to_apply }}"
+
+- name: Unzip Patch {{ item.patch_archive }}
+  unarchive:
+    src: "{{ binaries_dir }}/{{ item.patch_archive }}"
+    dest: "{{ binaries_dir }}"
+    remote_src: yes
+    list_files: true
+  with_items: "{{ osb_patches_to_apply }}"
+
+- name: Rollback conflicting OSB patches before install
+  include_tasks: osb_rollback.yml
+  tags: [rollback]
+
+- name: Apply patch {{ item.patch_id }}
+  shell:
+    cmd: "{{ opatch_home_osb }}/opatch apply -silent"
+    chdir: "{{ binaries_dir }}/{{ item.patch_id }}/"
+  register: opatch_apply_out
+  with_items: "{{ osb_patches_id }}"
+
+- debug:
+    var: opatch_apply_out.results

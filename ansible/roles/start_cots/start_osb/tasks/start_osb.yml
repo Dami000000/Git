@@ -1,0 +1,103 @@
+---
+- name: Check OSB NodeManager Server process
+  shell: "pgrep -f 'startNodeManager'"
+  register: osbNM_process_check
+  ignore_errors: True
+  changed_when: False
+  failed_when: False
+
+- name: Check OSB Admin Server process
+  shell: "pgrep -f 'startWebLogic.sh'"
+  register: OSBAdmin_check
+  ignore_errors: True
+  changed_when: False
+  failed_when: False
+
+- name: Check OSB Managed Server process
+  shell: "pgrep -f 'osb_server'"
+  register: OSB_check
+  ignore_errors: True
+  changed_when: False
+  failed_when: False
+
+- name: Start OSB NodeManager
+  shell:
+    cmd: "nohup ./startNodeManager.sh &"
+    chdir: "{{ osb_domain }}/bin"
+  register: startNM
+  when:
+    - osbNM_process_check.rc != 0
+- debug:
+    var: startNM.stdout_lines
+
+- name: Start OSB Admin Server
+  shell:
+    cmd: 'nohup {{ osb_domain }}/bin/startWebLogic.sh </dev/null >"{{ osb_domain }}/servers/AdminServer/logs/AdminServer.out" 2>&1 &'
+  register: startAdmin
+  when:
+    - inventory_hostname == 'osb1.' + ap + '.' + env + '.ccn2.taxud'
+    - OSBAdmin_check.rc != 0
+
+- name: Wait for OSB Admin Server to Start
+  wait_for:
+    host: "osb1.{{ ap }}.{{ env }}.ccn2.taxud"
+    port: "{{ osb_admin_server_port }}"
+    delay: 10
+    timeout: 300
+  when:
+    - inventory_hostname == 'osb1.' + ap + '.' + env + '.ccn2.taxud'
+    - OSBAdmin_check.rc != 0
+
+- name: Start OSB Managed Server - node1
+  shell:
+    cmd: 'nohup ./startManagedWebLogic.sh {{ osb_managed_server_node1 }} {{ osb_admin_server_url }}:{{ osb_admin_server_port }} </dev/null >"{{ osb_domain }}/servers/{{ osb_managed_server_node1 }}/logs/{{ osb_managed_server_node1 }}.out" 2>&1 &'
+    chdir: "{{ osb_domain }}/bin"
+  register: startManagedServer1_out
+  when:
+    - inventory_hostname == 'osb1.' + ap + '.' + env + '.ccn2.taxud'
+    - OSB_check.rc != 0
+
+- name: Waiting for OSB Managed Server node1 to start (checking every 15s)
+  wait_for:
+    host: "osb1.{{ ap }}.{{ env }}.ccn2.taxud"
+    port: "{{ osb_managed_server_port }}"
+    delay: 15
+    sleep: 15
+    timeout: 600
+    msg: "Still waiting for osb_server1 on port {{ osb_managed_server_port }}..."
+  when:
+    - inventory_hostname == 'osb1.' + ap + '.' + env + '.ccn2.taxud'
+    - OSB_check.rc != 0
+
+- debug:
+    msg: "OSB Managed Server node1 is UP on port {{ osb_managed_server_port }}"
+  when:
+    - inventory_hostname == 'osb1.' + ap + '.' + env + '.ccn2.taxud'
+    - OSB_check.rc != 0
+
+- name: Start OSB Managed Server - node2
+  shell:
+    cmd: 'nohup ./startManagedWebLogic.sh {{ osb_managed_server_node2 }} {{ osb_admin_server_url }}:{{ osb_admin_server_port }} </dev/null >"{{ osb_domain }}/servers/{{ osb_managed_server_node2 }}/logs/{{ osb_managed_server_node2 }}.out" 2>&1 &'
+    chdir: "{{ osb_domain }}/bin"
+  register: startManagedServer2_out
+  when:
+    - inventory_hostname == 'osb2.' + ap + '.' + env + '.ccn2.taxud'
+    - OSB_check.rc != 0
+
+- name: Waiting for OSB Managed Server node2 to start (checking every 15s)
+  wait_for:
+    host: "osb2.{{ ap }}.{{ env }}.ccn2.taxud"
+    port: "{{ osb_managed_server_port }}"
+    delay: 15
+    sleep: 15
+    timeout: 600
+    msg: "Still waiting for osb_server2 on port {{ osb_managed_server_port }}..."
+  when:
+    - inventory_hostname == 'osb2.' + ap + '.' + env + '.ccn2.taxud'
+    - OSB_check.rc != 0
+
+- debug:
+    msg: "OSB Managed Server node2 is UP on port {{ osb_managed_server_port }}"
+  when:
+    - inventory_hostname == 'osb2.' + ap + '.' + env + '.ccn2.taxud'
+    - OSB_check.rc != 0

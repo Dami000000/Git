@@ -1,0 +1,19 @@
+---
+# ============================================================
+# OIG Patch Rollback
+# Rolls back patches listed in oig_patches_rollback (vars.yml)
+# If oig_patches_rollback is empty ([]) this task is skipped
+# Checks lsinventory per-patch sequentially to handle cascade subsets
+# ============================================================
+
+- name: Skip rollback - no patches defined in oig_patches_rollback
+  debug:
+    msg: "No patches to rollback for OIG. Skipping."
+  when: oig_patches_rollback | length == 0
+
+- name: Rollback OIG patches sequentially
+  include_tasks: oig_rollback_single.yml
+  loop: "{{ oig_patches_rollback }}"
+  loop_control:
+    loop_var: patch_item
+  when: oig_patches_rollback | length > 0

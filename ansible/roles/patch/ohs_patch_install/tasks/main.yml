@@ -1,0 +1,2 @@
+---
+- import_tasks: ohs_install.yml

@@ -1,0 +1,47 @@
+---
+- name: Check current Java version before upgrade
+  shell:
+    cmd: /app/jdk/bin/java -version 2>&1 | awk -F '"' '/version/ {print "jdk" $2}'
+  register: current_java_version
+  ignore_errors: yes
+
+- name: Display current Java version
+  debug:
+    msg: "Current Java version: {{ current_java_version.stdout }}"
+
+- name: Backup current JDK with version name
+  shell: "cp -rp /app/jdk /app/{{ current_java_version.stdout }}_backup"
+  when: current_java_version.stdout != ""
+
+- name: Upload Java {{ jdk_archive }}
+  copy:
+    src: "{{ patches_dir_java }}/{{ jdk_archive }}"
+    dest: "{{ binaries_dir }}/{{ jdk_archive }}"
+
+- name: Unzip Java
+  unarchive:
+    src: "{{ binaries_dir }}/{{ jdk_archive }}"
+    dest: "/app"
+    remote_src: yes
+
+- name: Remove old /app/jdk symlink or directory
+  file:
+    path: /app/jdk
+    state: absent
+
+- name: Move new jdk to /app/jdk
+  shell: "mv /app/{{ new_jdk }} /app/jdk"
+
+- name: Check new Java version after upgrade
+  shell:
+    cmd: /app/jdk/bin/java -version 2>&1 | awk -F '"' '/version/ {print "jdk" $2}'
+  register: java_version_after
+
+- name: Display new Java version
+  debug:
+    msg: "New Java version: {{ java_version_after.stdout }}"
+
+- name: Stop playbook when new Java version is incorrect
+  fail:
+    msg: "Expected {{ new_jdk }} but found {{ java_version_after.stdout }}. Playbook stopped."
+  when: java_version_after.stdout != new_jdk

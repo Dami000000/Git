@@ -1,0 +1,9 @@
+---
+- name: Start AAG Instance
+  shell:
+    cmd: "./aagStart.sh"
+    chdir: /app/scripts/
+  register: startaag_out
+
+- debug:
+    var: startaag_out.stdout_lines

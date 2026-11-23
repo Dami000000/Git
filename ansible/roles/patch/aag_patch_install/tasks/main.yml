@@ -1,0 +1,2 @@
+---
+- import_tasks: aag_install.yml

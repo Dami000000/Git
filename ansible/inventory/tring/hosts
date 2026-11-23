@@ -1,0 +1,49 @@
+[all:vars]
+ansible_user=oracle 
+ansible_connection=ssh 
+
+### OUD ###
+[oud_ap1]
+tvai380.itsmtaxud.priv
+tvaj380.itsmtaxud.priv
+[oud_mh]
+tvan380.itsmtaxud.priv
+tvam380.itsmtaxud.priv
+[oud:children]
+oud_ap1
+oud_mh
+
+### OHS ###
+[ohs_ap1]
+tvaa380.itsmtaxud.priv
+tvab380.itsmtaxud.priv
+[ohs:children]
+ohs_ap1
+
+### OAM ###
+[oam_ap1]
+tvag380.itsmtaxud.priv
+tvah380.itsmtaxud.priv
+[oam:children]
+oam_ap1
+
+### OIG ###
+[oig_mh]
+tvak380.itsmtaxud.priv
+tval380.itsmtaxud.priv
+[oig:children]
+oig_mh
+
+### OSB ###
+[osb_ap1]
+tvae380.itsmtaxud.priv
+tvaf380.itsmtaxud.priv
+[osb:children]
+osb_ap1
+
+### AAG ###
+[aag_ap1]
+tvac380.itsmtaxud.priv
+tvad380.itsmtaxud.priv
+[aag:children]
+aag_ap1

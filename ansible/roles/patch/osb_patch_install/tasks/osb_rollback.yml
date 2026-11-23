@@ -1,0 +1,19 @@
+---
+# ============================================================
+# OSB Patch Rollback
+# Rolls back patches listed in osb_patches_rollback (vars.yml)
+# If osb_patches_rollback is empty ([]) this task is skipped
+# Checks lsinventory per-patch sequentially to handle cascade subsets
+# ============================================================
+
+- name: Skip rollback - no patches defined in osb_patches_rollback
+  debug:
+    msg: "No patches to rollback for OSB. Skipping."
+  when: osb_patches_rollback | length == 0
+
+- name: Rollback OSB patches sequentially
+  include_tasks: osb_rollback_single.yml
+  loop: "{{ osb_patches_rollback }}"
+  loop_control:
+    loop_var: patch_item
+  when: osb_patches_rollback | length > 0

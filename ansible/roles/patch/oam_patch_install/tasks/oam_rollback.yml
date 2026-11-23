@@ -1,0 +1,19 @@
+---
+# ============================================================
+# OAM Patch Rollback
+# Rolls back patches listed in oam_patches_rollback (vars.yml)
+# If oam_patches_rollback is empty ([]) this task is skipped
+# Checks lsinventory per-patch sequentially to handle cascade subsets
+# ============================================================
+
+- name: Skip rollback - no patches defined in oam_patches_rollback
+  debug:
+    msg: "No patches to rollback for OAM. Skipping."
+  when: oam_patches_rollback | length == 0
+
+- name: Rollback OAM patches sequentially
+  include_tasks: oam_rollback_single.yml
+  loop: "{{ oam_patches_rollback }}"
+  loop_control:
+    loop_var: patch_item
+  when: oam_patches_rollback | length > 0

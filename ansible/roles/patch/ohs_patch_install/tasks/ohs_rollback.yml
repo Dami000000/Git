@@ -1,0 +1,19 @@
+---
+# ============================================================
+# OHS Patch Rollback
+# Rolls back patches listed in ohs_patches_rollback (vars.yml)
+# If ohs_patches_rollback is empty ([]) this task is skipped
+# Checks lsinventory per-patch sequentially to handle cascade subsets
+# ============================================================
+
+- name: Skip rollback - no patches defined in ohs_patches_rollback
+  debug:
+    msg: "No patches to rollback for OHS. Skipping."
+  when: ohs_patches_rollback | length == 0
+
+- name: Rollback OHS patches sequentially
+  include_tasks: ohs_rollback_single.yml
+  loop: "{{ ohs_patches_rollback }}"
+  loop_control:
+    loop_var: patch_item
+  when: ohs_patches_rollback | length > 0

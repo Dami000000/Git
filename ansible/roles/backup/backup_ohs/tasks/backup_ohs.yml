@@ -1,0 +1,17 @@
+---
+- name: Create backup directory if not exist
+  file:
+    path: /home/oracle/backup
+    state: directory
+
+- name: Create backup of OHS configuration files - {{ ohs_config_dir }}
+  archive:
+    path: "{{ ohs_config_dir }}"
+    dest: /home/oracle/backup/OHS_config_{{ ansible_date_time.date }}_full_backup.tar.gz
+    format: gz
+
+- name: Create backup of OHS oracle home - {{ oracle_home_ohs }}
+  archive:
+    path: "{{ oracle_home_ohs }}"
+    dest: /home/oracle/backup/fmwOHS12214_{{ ansible_date_time.date }}_full_backup.tar.gz
+    format: gz

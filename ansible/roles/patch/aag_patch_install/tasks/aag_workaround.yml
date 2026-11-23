@@ -1,0 +1,44 @@
+---
+- name: Update Content Security Policy in envSettings.props
+  ansible.builtin.lineinfile:
+    path: /app/Axway-7.7.0/apigateway/conf/envSettings.props
+    regexp: '^env\.MANAGEMENT\.CONTENTSECURITYPOLICY='
+    line: >-
+      env.MANAGEMENT.CONTENTSECURITYPOLICY=script-src 'self' 'unsafe-eval'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; object-src 'self'; media-src 'self'; frame-src 'self'; frame-ancestors 'none'; upgrade-insecure-requests; manifest-src 'none'; connect-src 'self' https://portals-search-api.admin.axway.com; form-action 'self'; prefetch-src 'none'
+    backup: yes
+
+- name: Verify Content Security Policy workaround
+  ansible.builtin.command:
+    argv:
+      - grep
+      - -F
+      - "env.MANAGEMENT.CONTENTSECURITYPOLICY=script-src 'self' 'unsafe-eval'"
+      - /app/Axway-7.7.0/apigateway/conf/envSettings.props
+  register: csp_check
+  changed_when: false
+
+- name: Show Content Security Policy verification result
+  ansible.builtin.debug:
+    var: csp_check.stdout_lines
+
+- name: Enable XML_PARSE_HUGE in libxml.xml
+  ansible.builtin.lineinfile:
+    path: /app/Axway-7.7.0/apigateway/system/conf/libxml.xml
+    regexp: '^(\s*<LibxmlFeature name="XML_PARSE_HUGE"\s+value=")[^"]+("/>\s*)$'
+    line: '\g<1>1\g<2>'
+    backrefs: yes
+    backup: yes
+
+- name: Verify XML_PARSE_HUGE value in libxml.xml
+  ansible.builtin.command:
+    argv:
+      - grep
+      - -E
+      - '<LibxmlFeature name="XML_PARSE_HUGE"[[:space:]]+value="1"'
+      - /app/Axway-7.7.0/apigateway/system/conf/libxml.xml
+  register: libxml_huge_check
+  changed_when: false
+
+- name: Show XML_PARSE_HUGE verification result
+  ansible.builtin.debug:
+    var: libxml_huge_check.stdout_lines
