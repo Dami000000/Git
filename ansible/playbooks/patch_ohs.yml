@@ -11,10 +11,7 @@
 #     ansible-playbook -i inventory/dev/hosts playbooks/patch_ohs.yml -e "target=ohs_ap2"
 #
 #   Patch specific server:
-#     ansible-playbook -i inventory/dev/hosts playbooks/patch_ohs.yml -e "target=ohs1.ap1.dev.ccn2.taxud"
-#
-#   Patch on FAT environment:
-#     ansible-playbook -i inventory/fat/hosts playbooks/patch_ohs.yml -e "target=ohs_ap1"
+#     ansible-playbook -i inventory/dev/hosts playbooks/patch_ohs.yml -e "target=ohs_ap1"
 #
 #   Override serial (default: 1 host at a time):
 #     ansible-playbook -i inventory/dev/hosts playbooks/patch_ohs.yml -e "serial=2"
@@ -41,6 +38,8 @@
 
     - name: Install/Update JDK
       include_tasks: ../roles/jdk/tasks/jdk_install.yml
+      vars:
+        backup_dir_jdk: "{{ backup_dir_ohs }}"
       tags: [jdk]
 
     - name: Install/Update OPatch for OHS
@@ -50,13 +49,6 @@
     - name: Apply OHS patches
       include_tasks: ../roles/patch/ohs_patch_install/tasks/ohs_install.yml
       tags: [patch]
-
-    - name: Delete inactive OHS patches
-      include_tasks: ../roles/opatch_cleanup/tasks/delete_inactive_patches.yml
-      vars:
-        oracle_home: "{{ oracle_home_ohs }}"
-        opatch_home: "{{ opatch_home_ohs }}"
-      tags: [patch_cleanup]
 
     - name: Start OHS services
       include_tasks: ../roles/start_cots/start_ohs/tasks/start_ohs.yml

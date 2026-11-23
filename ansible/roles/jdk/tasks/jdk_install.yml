@@ -1,7 +1,7 @@
 ---
 - name: Check current Java version before upgrade
   shell:
-    cmd: /app/jdk/bin/java -version 2>&1 | awk -F '"' '/version/ {print "jdk" $2}'
+    cmd: "{{ java_home }}/bin/java -version 2>&1 | awk -F '\"' '/version/ {print \"jdk\" $2}'"
   register: current_java_version
   ignore_errors: yes
 
@@ -9,8 +9,25 @@
   debug:
     msg: "Current Java version: {{ current_java_version.stdout }}"
 
-- name: Backup current JDK with version name
-  shell: "cp -rp /app/jdk /app/{{ current_java_version.stdout }}_backup"
+- name: Ensure product JDK backup directory exists
+  file:
+    path: "{{ backup_dir_jdk }}"
+    state: directory
+    owner: "{{ oracle_user }}"
+    group: "{{ oracle_group }}"
+    mode: '0755'
+
+- name: Create compressed backup of current JDK
+  command:
+    cmd: >-
+      tar -czf {{ backup_dir_jdk }}/{{ current_java_version.stdout }}_{{ ansible_date_time.iso8601_basic_short }}_backup.tar.gz
+      -C {{ java_home | dirname }} {{ java_home | basename }}
+  when: current_java_version.stdout != ""
+
+- name: Remove old JDK from /app after successful backup
+  file:
+    path: "{{ java_home }}"
+    state: absent
   when: current_java_version.stdout != ""
 
 - name: Upload Java {{ jdk_archive }}
@@ -21,20 +38,16 @@
 - name: Unzip Java
   unarchive:
     src: "{{ binaries_dir }}/{{ jdk_archive }}"
-    dest: "/app"
+    dest: /app
     remote_src: yes
 
-- name: Remove old /app/jdk symlink or directory
-  file:
-    path: /app/jdk
-    state: absent
-
-- name: Move new jdk to /app/jdk
-  shell: "mv /app/{{ new_jdk }} /app/jdk"
+- name: Move new JDK to java_home
+  command:
+    cmd: "mv /app/{{ new_jdk }} {{ java_home }}"
 
 - name: Check new Java version after upgrade
   shell:
-    cmd: /app/jdk/bin/java -version 2>&1 | awk -F '"' '/version/ {print "jdk" $2}'
+    cmd: "{{ java_home }}/bin/java -version 2>&1 | awk -F '\"' '/version/ {print \"jdk\" $2}'"
   register: java_version_after
 
 - name: Display new Java version

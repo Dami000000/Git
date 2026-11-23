@@ -13,9 +13,6 @@
 #   Patch specific server:
 #     ansible-playbook -i inventory/dev/hosts playbooks/patch_oud.yml -e "target=oud1.ap1.dev.ccn2.taxud"
 #
-#   Patch on FAT environment:
-#     ansible-playbook -i inventory/fat/hosts playbooks/patch_oud.yml -e "target=oud_ap1"
-#
 #   Override serial (default: 1 host at a time):
 #     ansible-playbook -i inventory/dev/hosts playbooks/patch_oud.yml -e "serial=2"
 #
@@ -41,6 +38,8 @@
 
     - name: Install/Update JDK
       include_tasks: ../roles/jdk/tasks/jdk_install.yml
+      vars:
+        backup_dir_jdk: "{{ backup_dir_oud }}"
       tags: [jdk]
 
     - name: Install/Update OPatch for OUD
@@ -50,13 +49,6 @@
     - name: Apply OUD patches
       include_tasks: ../roles/patch/oud_patch_install/tasks/oud_install.yml
       tags: [patch]
-
-    - name: Delete inactive OUD patches
-      include_tasks: ../roles/opatch_cleanup/tasks/delete_inactive_patches.yml
-      vars:
-        oracle_home: "{{ oracle_home_oud }}"
-        opatch_home: "{{ opatch_home_oud }}"
-      tags: [patch_cleanup]
 
     - name: Start OUD services
       include_tasks: ../roles/start_cots/start_oud/tasks/start_oud.yml
