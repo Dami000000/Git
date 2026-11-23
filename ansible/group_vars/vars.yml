@@ -31,12 +31,12 @@ binaries_dir: /app/binaries
 # ============================================================
 # Backup directories on target servers
 # ============================================================
-backup_dir_aag: /app/backup/aag
-backup_dir_oam: /app/backup/oracle/oam
-backup_dir_oig: /app/backup/oracle/oig
-backup_dir_ohs: /app/backup/oracle/ohs
-backup_dir_oud: /app/backup/oracle/oud
-backup_dir_osb: /app/backup/oracle/osb
+backup_dir_aag: /app/backup
+backup_dir_oam: /app/backup
+backup_dir_oig: /app/backup
+backup_dir_ohs: /app/backup
+backup_dir_oud: /app/backup
+backup_dir_osb: /app/backup
 
 # ============================================================
 # Patches source directory on ANSIBLE HOST (where scripts run)
