@@ -29,7 +29,7 @@ oracle_home_oud: /app/fmwOUD12214
 binaries_dir: /app/binaries
 
 # ============================================================
-# Backup directories on target servers
+# Backup locations for Oracle (FMW and Application Domains) and AAG before patch installation
 # ============================================================
 backup_dir_aag: /app/backup
 backup_dir_oam: /app/backup
