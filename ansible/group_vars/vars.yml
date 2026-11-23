@@ -27,8 +27,16 @@ oracle_home_oud: /app/fmwOUD12214
 # Patch archives are copied here and extracted before install
 # ============================================================
 binaries_dir: /app/binaries
-#
+
 # ============================================================
+# Backup directories on target servers
+# ============================================================
+backup_dir_aag: /app/backup/aag
+backup_dir_oam: /app/backup/oracle/oam
+backup_dir_oig: /app/backup/oracle/oig
+backup_dir_ohs: /app/backup/oracle/ohs
+backup_dir_oud: /app/backup/oracle/oud
+backup_dir_osb: /app/backup/oracle/osb
 
 # ============================================================
 # Patches source directory on ANSIBLE HOST (where scripts run)
@@ -43,8 +51,6 @@ binaries_dir: /app/binaries
 #     └── OSB/
 # ============================================================
 patches_dir: /app/patches
-#
-# ============================================================
 
 patches_dir_java: "{{ patches_dir }}/JAVA"
 patches_dir_aag:  "{{ patches_dir }}/AAG"
@@ -113,13 +119,11 @@ oam_patches_to_apply:
   - patch_archive: p38832179_122140_Linux-x86-64.zip
   - patch_archive: p36739303_12214221222_Generic.zip
 
-
 oam_patches_id:
   - patch_id: 34809489
   - patch_id: 38098858
   - patch_id: 38832179
   - patch_id: 36739303
-
 
 # OAM patches to rollback before applying new patches (leave empty [] if none)
 oam_patches_rollback: []
@@ -161,13 +165,11 @@ oig_patches_to_apply:
   - patch_archive: p38832179_122140_Linux-x86-64.zip
   - patch_archive: p36739303_12214221222_Generic.zip
 
-
 oig_patches_id:
   - patch_id: 34809489
   - patch_id: 38098858
   - patch_id: 38832179
   - patch_id: 36739303
-
 
 # OIG patches to rollback before applying new patches (leave empty [] if none)
 oig_patches_rollback: []
@@ -178,7 +180,6 @@ oig_patches_rollback: []
 ohs_domain: /app/config/mserver/domains/IAMGovernanceDomain
 ohs_config_dir: /app/config
 
-# OHS patch archives
 ohs_patches_to_apply:
   - patch_archive: p40005842_122140_Linux-x86-64.zip
   - patch_archive: p39951739_122140_Linux-x86-64.zip
@@ -194,7 +195,6 @@ ohs_patches_to_apply:
   - patch_archive: p38832179_122140_Linux-x86-64.zip
   - patch_archive: p37056593_122140_Generic.zip
   - patch_archive: p36789759_122140_Generic.zip
-
 
 ohs_patches_id:
   - patch_id: 40005842
@@ -217,14 +217,12 @@ ohs_patches_rollback:
   - patch_id: 39096983
   - patch_id: 39372515
   - patch_id: 34879707
-    
 
 # ============================================================
 # OUD specific variables
 # ============================================================
 oud_ldap_instance: /app/ldap_instance
 
-# OUD patch archives
 oud_patches_to_apply:
   - patch_archive: p40069416_122140_Generic.zip
   - patch_archive: p39988961_122140_Generic.zip
@@ -235,7 +233,6 @@ oud_patches_to_apply:
   - patch_archive: p35965629_122140_Linux-x86-64.zip
   - patch_archive: p36789759_122140_Generic.zip
   - patch_archive: p39761493_122140_Generic.zip
-
 
 oud_patches_id:
   - patch_id: 40069416
@@ -248,13 +245,11 @@ oud_patches_id:
   - patch_id: 36789759
   - patch_id: 39761493
 
-
 # OUD patches to rollback before applying new patches (leave empty [] if none)
 #oud_patches_rollback: []
 oud_patches_rollback:
   - patch_id: 39096983
   - patch_id: 39372515
-
 
 # ============================================================
 # OSB specific variables
@@ -265,7 +260,6 @@ osb_admin_server_port: 7001
 osb_managed_server_port: 7010
 
 osb_domain: /app/domains/OSB_dom
-
 osb_managed_server_node1: osb_server1
 osb_managed_server_node2: osb_server2
 
@@ -280,11 +274,8 @@ osb_spbat_patch_id: SOA_SPB_12.2.1.4.261008
 osb_patches_to_apply:
   - patch_archive: p36087199_122140_Linux-x86-64.zip
 
-
 osb_patches_id:
   - patch_id: 36087199
-
-
 
 # OSB patches to rollback before applying new patches (leave empty [] if none)
 osb_patches_rollback: []
