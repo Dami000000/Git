@@ -41,6 +41,8 @@
 
     - name: Install/Update JDK
       include_tasks: ../roles/jdk/tasks/jdk_install.yml
+      vars:
+        backup_dir_jdk: "{{ backup_dir_oam }}"
       tags: [jdk]
 
     - name: Replace Java cacerts for OAM
@@ -101,14 +103,6 @@
         label: "{{ oam_admin_server_domain }}/servers/AdminServer/{{ item }}"
       when: inventory_hostname == 'oam1.' + ap + '.' + env + '.ccn2.taxud'
       tags: [cleanup]
-
-    - name: Cleanup patch installation directory
-      include_tasks: ../roles/binaries_cleanup/tasks/main.yml
-      vars:
-        patch_product: oam
-        patch_backup_dir: "{{ backup_dir_oam }}"
-        archive_spbat_logs: true
-      tags: [binaries_cleanup]
 
     - name: Start OAM services
       include_tasks: ../roles/start_cots/start_oam/tasks/start_oam.yml

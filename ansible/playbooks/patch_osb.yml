@@ -41,6 +41,8 @@
 
     - name: Install/Update JDK
       include_tasks: ../roles/jdk/tasks/jdk_install.yml
+      vars:
+        backup_dir_jdk: "{{ backup_dir_osb }}"
       tags: [jdk]
 
     - name: Replace Java cacerts for OSB

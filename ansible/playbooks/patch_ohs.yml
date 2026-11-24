@@ -13,6 +13,9 @@
 #   Patch specific server:
 #     ansible-playbook -i inventory/dev/hosts playbooks/patch_ohs.yml -e "target=ohs1.ap1.dev.ccn2.taxud"
 #
+#   Patch on FAT environment:
+#     ansible-playbook -i inventory/fat/hosts playbooks/patch_ohs.yml -e "target=ohs_ap1"
+#
 #   Override serial (default: 1 host at a time):
 #     ansible-playbook -i inventory/dev/hosts playbooks/patch_ohs.yml -e "serial=2"
 #
@@ -38,6 +41,8 @@
 
     - name: Install/Update JDK
       include_tasks: ../roles/jdk/tasks/jdk_install.yml
+      vars:
+        backup_dir_jdk: "{{ backup_dir_ohs }}"
       tags: [jdk]
 
     - name: Replace Java cacerts for OHS
