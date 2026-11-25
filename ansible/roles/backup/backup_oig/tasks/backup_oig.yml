@@ -15,5 +15,4 @@
 - name: Create backup of OIG Admin Server configuration files - {{ oig_admin_server_domain }}
   shell:
     cmd: "tar czf {{ backup_dir_oig }}/Admin_OIG_config_{{ ansible_date_time.date }}_full_backup.tar.gz {{ oig_admin_server_domain }}"
-  when:
-    - inventory_hostname == 'oim1.' + mh + '.' + env + '.ccn2.taxud'
+  when: inventory_hostname is match('^oim1\\.')
